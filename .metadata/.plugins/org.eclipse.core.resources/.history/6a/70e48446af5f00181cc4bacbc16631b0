@@ -94,7 +94,7 @@ public class FileManager20216 {
                 case 0:
                 	return fileSystemView.getSystemDisplayName(file);
                 case 1:
-                    return file.length()+"Byte";
+                    return file.length()+"KB";
                 case 2:
                 	return file.lastModified();
                 default:

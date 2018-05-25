@@ -94,7 +94,7 @@ public class FileManager20216 {
                 case 0:
                 	return fileSystemView.getSystemDisplayName(file);
                 case 1:
-                    return file.length()+"Byte";
+                    return file.length();
                 case 2:
                 	return file.lastModified();
                 default:
@@ -480,7 +480,7 @@ public class FileManager20216 {
             public Void doInBackground() {
                 File file = (File) node.getUserObject();
                 if (file.isDirectory()) {
-                    File[] files = fileSystemView.getFiles(file, true); 
+                    File[] files = fileSystemView.getFiles(file, true); //!!
                     if (node.isLeaf()) {
                         for (File child : files) {
                             if (child.isDirectory()) {
