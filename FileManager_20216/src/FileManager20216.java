@@ -54,7 +54,7 @@ public class FileManager20216 {
         };
     private Desktop desktop;
     private FileSystemView fileSystemView;
-    private File currentFile;
+    private static File currentFile;
     private JPanel gui;
     
     private JTree tree;
@@ -75,69 +75,7 @@ public class FileManager20216 {
 
     private JTextField path;
     
-    class FileTableModel extends AbstractTableModel {
-
-        private File[] files;
-        private FileSystemView fileSystemView = FileSystemView.getFileSystemView();
-
-        FileTableModel() {
-            this(new File[0]);
-        }
-
-        FileTableModel(File[] files) {
-            this.files = files;
-        }
-
-        public Object getValueAt(int row, int column) {
-            File file = files[row];
-            switch (column) {
-                case 0:
-                	return fileSystemView.getSystemDisplayName(file);
-                case 1:
-                    return file.length()+"Byte";
-                case 2:
-                	return file.lastModified();
-                default:
-                    System.err.println("Logic Error");
-            }
-            return "";
-        }
-
-        public int getColumnCount() {
-            return columns.length;
-        }
-
-        public Class<?> getColumnClass(int column) {
-            switch (column) {
-                case 1:
-                    return Long.class;
-                case 2:
-                    return Date.class;
-
-            }
-            return String.class;
-        }
-
-        public String getColumnName(int column) {
-            return columns[column];
-        }
-
-        public int getRowCount() {
-            return files.length;
-        }
-
-        public File getFile(int row) {
-            return files[row];
-        }
-
-        public void setFiles(File[] files) {
-            this.files = files;
-            fireTableDataChanged();
-        }
-        
-        	
-
-    }
+    
 
     
     public Container getGui() {
@@ -242,9 +180,9 @@ public class FileManager20216 {
             	    	copyFile.setText("Copy");
             	    	deleteFile.setText("delete");
             	    	PasteFile.setText("Paste");
-            	    	columns[0]="Name";
-            	    	columns[1]="Size";
-            	    	columns[2]="Last Modified";
+            	    	FileTableModel.columns[0]="Name";
+            	    	FileTableModel.columns[1]="Size";
+            	    	FileTableModel.columns[2]="Last Modified";
             	    }
             	    else if((combo.getSelectedItem().toString()).equals("한국어")) {
             	    	APP_TITLE = "파일 매니저";
@@ -252,9 +190,9 @@ public class FileManager20216 {
             	    	copyFile.setText("복사");
             	    	deleteFile.setText("삭제");
             	    	PasteFile.setText("붙여넣기");
-            	    	columns[0]="이름";
-            	    	columns[1]="크기";
-            	    	columns[2]="마지막 수정일";
+            	    	FileTableModel.columns[0]="이름";
+            	    	FileTableModel.columns[1]="크기";
+            	    	FileTableModel.columns[2]="마지막 수정일";
             	    }
             	   }
             	  });
@@ -310,15 +248,15 @@ public class FileManager20216 {
 
             PasteFile = new JButton("Paste");
             PasteFile.setMnemonic('p');
-            PasteFile.addActionListener(new ActionListener(){
+            /*PasteFile.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae) {
-                	/*try {
-						PasteFile();
+                	try {
+						PasteFile(created);
 					} catch (IOException e) {
 						showErrorMessage("'Copy' not implemented.", "Not implemented.");
-					}*/
+					}
                 }
-            });
+            });*/
             toolBar.add(PasteFile);
 
             deleteFile = new JButton("Delete");
@@ -553,8 +491,36 @@ public class FileManager20216 {
         return created;
     }
     
-    /*public static boolean PasteFile(void) throws IOException{
-    	return c;
+    /*public static boolean PasteFile(File ClipBoard) throws IOException{
+    	boolean created;
+        File parentFile = currentFile;
+        if (!parentFile.isDirectory()) {
+            parentFile = parentFile.getParentFile();
+        }
+        File file = new File( parentFile, name.getText() );
+        if (newTypeFile.isSelected()) {
+            created = file.createNewFile();
+        } else {
+            created = file.mkdir();
+        }
+        if (created) {
+
+            TreePath parentPath = findTreePath(parentFile);
+            DefaultMutableTreeNode parentNode =
+                (DefaultMutableTreeNode)parentPath.getLastPathComponent();
+
+            if (file.isDirectory()) {
+                // add the new node..
+                DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(file);
+
+                TreePath currentPath = findTreePath(currentFile);
+                DefaultMutableTreeNode currentNode =
+                    (DefaultMutableTreeNode)currentPath.getLastPathComponent();
+
+                treeModel.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
+            }
+
+            showChildren(parentNode);
     }*/
 
     public static void main(String[] args) {
@@ -583,6 +549,73 @@ public class FileManager20216 {
 }
 
 
+class FileTableModel extends AbstractTableModel {
+	public static String[] columns = {
+            "Name",
+            "Size",
+            "Last Modified"
+        };
+    private File[] files;
+    private FileSystemView fileSystemView = FileSystemView.getFileSystemView();
+
+    FileTableModel() {
+        this(new File[0]);
+    }
+
+    FileTableModel(File[] files) {
+        this.files = files;
+    }
+
+    public Object getValueAt(int row, int column) {
+        File file = files[row];
+        switch (column) {
+            case 0:
+            	return fileSystemView.getSystemDisplayName(file);
+            case 1:
+                return file.length()+"Byte";
+            case 2:
+            	return file.lastModified();
+            default:
+                System.err.println("Logic Error");
+        }
+        return "";
+    }
+
+    public int getColumnCount() {
+        return columns.length;
+    }
+
+    public Class<?> getColumnClass(int column) {
+        switch (column) {
+            case 1:
+                return Long.class;
+            case 2:
+                return Date.class;
+
+        }
+        return String.class;
+    }
+
+    public String getColumnName(int column) {
+        return columns[column];
+    }
+
+    public int getRowCount() {
+        return files.length;
+    }
+
+    public File getFile(int row) {
+        return files[row];
+    }
+
+    public void setFiles(File[] files) {
+        this.files = files;
+        fireTableDataChanged();
+    }
+    
+    	
+
+}
 class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private FileSystemView fileSystemView;
